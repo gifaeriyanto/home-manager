@@ -1,116 +1,83 @@
-- name: Fish shell configuration
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Install Fish shell
-      homebrew:
-        name: fish
-        state: present
+- name: Install Fish shell
+  homebrew:
+    name: fish
+    state: present
 
-    - name: Install Fish plugins
-      homebrew:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - thefuck
-        - z
+- name: Install Fish plugins
+  homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - thefuck
+    - z
 
-    - name: Set Fish as the default shell
-      shell: |
-        if ! grep -Fxq "/usr/local/bin/fish" /etc/shells; then
-          echo "/usr/local/bin/fish" | sudo tee -a /etc/shells
-        fi
-        chsh -s /usr/local/bin/fish
-      args:
-        executable: /bin/bash
+- name: Add Fish shell to /etc/shells
+  shell: |
+    if ! grep -Fxq "/opt/homebrew/bin/fish" /etc/shells; then
+      echo "/opt/homebrew/bin/fish" | sudo tee -a /etc/shells
+    fi
+  args:
+    executable: /bin/bash
 
-    - name: Add Fish shell initialization
-      lineinfile:
-        path: ~/.config/fish/config.fish
-        create: yes
-        line: |
-          # Max open files limit
-          ulimit -n 200000
-          # Max processes limit
-          ulimit -u 2048
-          # Fish color configuration
-          set -U fish_color_command 6CB6EB --bold
-          set -U fish_color_redirection DEB974
-          set -U fish_color_operator DEB974
-          set -U fish_color_end C071D8 --bold
-          set -U fish_color_error EC7279 --bold
-          set -U fish_color_param 6CB6EB
-          set fish_greeting
+- name: Set Fish as the default shell
+  shell: |
+    chsh -s /opt/homebrew/bin/fish
+  args:
+    executable: /bin/bash
 
-    - name: Install Starship prompt
-      homebrew:
-        name: starship
-        state: present
+- name: Add Homebrew to Fish PATH
+  lineinfile:
+    path: ~/.config/fish/config.fish
+    create: yes
+    regexp: '^set -U fish_user_paths /opt/homebrew/bin'
+    line: 'set -U fish_user_paths /opt/homebrew/bin $fish_user_paths'
 
-    - name: Add Starship configuration
-      copy:
-        dest: ~/.config/starship.toml
-        content: |
-          add_newline = true
-          command_timeout = 1000
-          [cmd_duration]
-          format = " [$duration]($style) "
-          style = "bold #EC7279"
-          show_notifications = true
-          [directory]
-          truncate_to_repo = false
-          [nix_shell]
-          format = " [$symbol$state]($style) "
-          [battery]
-          full_symbol = "🔋 "
-          charging_symbol = "⚡️ "
-          discharging_symbol = "💀 "
-          [git_branch]
-          format = "[$symbol$branch]($style) "
-          symbol = " "
-          [gcloud]
-          format = "[$symbol$active]($style) "
-          symbol = "  "
-          [aws]
-          symbol = "  "
-          [buf]
-          symbol = " "
-          [c]
-          symbol = " "
-          [conda]
-          symbol = " "
-          [dart]
-          symbol = " "
-          [directory]
-          read_only = " "
-          [docker_context]
-          symbol = " "
-          [elixir]
-          symbol = " "
-          [elm]
-          symbol = " "
-          [golang]
-          symbol = " "
-          [haskell]
-          symbol = " "
-          [java]
-          symbol = " "
-          [julia]
-          symbol = " "
-          [memory_usage]
-          symbol = " "
-          [nim]
-          symbol = " "
-          [nix_shell]
-          symbol = " "
-          [nodejs]
-          symbol = " "
-          [package]
-          symbol = " "
-          [python]
-          symbol = " "
-          [spack]
-          symbol = "🅢 "
-          [rust]
-          symbol = " "
+- name: Add Fish shell initialization
+  lineinfile:
+    path: ~/.config/fish/config.fish
+    create: yes
+    regexp: '^ulimit -n'
+    line: 'ulimit -n 200000'
+  with_items:
+    - { regexp: '^ulimit -n', line: 'ulimit -n 200000' }
+    - { regexp: '^ulimit -u', line: 'ulimit -u 2048' }
+    - { regexp: '^set -U fish_color_command', line: 'set -U fish_color_command 6CB6EB --bold' }
+    - { regexp: '^set -U fish_color_redirection', line: 'set -U fish_color_redirection DEB974' }
+    - { regexp: '^set -U fish_color_operator', line: 'set -U fish_color_operator DEB974' }
+    - { regexp: '^set -U fish_color_end', line: 'set -U fish_color_end C071D8 --bold' }
+    - { regexp: '^set -U fish_color_error', line: 'set -U fish_color_error EC7279 --bold' }
+    - { regexp: '^set -U fish_color_param', line: 'set -U fish_color_param 6CB6EB' }
+    - { regexp: '^set fish_greeting', line: 'set fish_greeting' }
+  loop: "{{ items }}"
+  loop_control:
+    loop_var: item
+  vars:
+    items:
+      - { regexp: '^ulimit -n', line: 'ulimit -n 200000' }
+      - { regexp: '^ulimit -u', line: 'ulimit -u 2048' }
+      - { regexp: '^set -U fish_color_command', line: 'set -U fish_color_command 6CB6EB --bold' }
+      - { regexp: '^set -U fish_color_redirection', line: 'set -U fish_color_redirection DEB974' }
+      - { regexp: '^set -U fish_color_operator', line: 'set -U fish_color_operator DEB974' }
+      - { regexp: '^set -U fish_color_end', line: 'set -U fish_color_end C071D8 --bold' }
+      - { regexp: '^set -U fish_color_error', line: 'set -U fish_color_error EC7279 --bold' }
+      - { regexp: '^set -U fish_color_param', line: 'set -U fish_color_param 6CB6EB' }
+      - { regexp: '^set fish_greeting', line: 'set fish_greeting' }
 
+- name: Install Starship prompt
+  homebrew:
+    name: starship
+    state: present
+
+- name: Add Starship initialization to Fish config
+  lineinfile:
+    path: ~/.config/fish/config.fish
+    create: yes
+    regexp: '^starship init fish'
+    line: 'starship init fish | source'
+
+- name: Apply Starship Nerd Font preset
+  shell: |
+    starship preset nerd-font-symbols -o ~/.config/starship.toml
+  args:
+    executable: /bin/bash
+  register: starship_preset_result

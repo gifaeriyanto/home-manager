@@ -1,60 +1,60 @@
-- name: Homebrew configuration for macOS
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Ensure Homebrew is installed
-      homebrew:
-        state: present
+- name: Ensure Homebrew is installed
+  homebrew:
+    state: present
 
-    - name: Set up Homebrew shell environment
-      shell: |
-        eval "$(/usr/local/bin/brew shellenv)"
-      when: brew_enabled | default(true)
+- name: Set up Homebrew shell environment
+  shell: |
+    eval "$(/usr/local/bin/brew shellenv)"
+  when: brew_enabled | default(true)
 
-    - name: Install MAS CLI (Mac App Store command-line tool)
-      homebrew:
-        name: mas
-        state: present
+- name: Install MAS CLI (Mac App Store command-line tool)
+  homebrew:
+    name: mas
+    state: present
 
-    - name: Install Mac App Store applications
-      command: mas install "{{ item }}"
-      loop:
-        - 1452453066  # HiddenBar
-        - 409183694   # Keynote
-        - 409203825   # Numbers
-        - 409201541   # Pages
-        - 803453959   # Slack
-        - 747648890   # Telegram
+- name: Install Mac App Store applications
+  command: mas install "{{ item }}"
+  loop:
+    - 1452453066 # HiddenBar
+    - 409183694 # Keynote
+    - 409203825 # Numbers
+    - 409201541 # Pages
+    - 803453959 # Slack
+    - 747648890 # Telegram
 
-    - name: Install Homebrew brews
-      homebrew:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - n
-        - pinentry-mac
-        - yarn
-        - python@3.10
+- name: Install Homebrew brews
+  homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - n
+    - pinentry-mac
+    - yarn
+    - ghq
+    - gnupg
+    - gh
+    - python@3.10
 
-    - name: Install Homebrew casks
-      homebrew_cask:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - arc
-        - capcut
-        - discord
-        - iterm2
-        - notion
-        - raycast
-        - rectangle
-        - spotify
-        - visual-studio-code
-        - zoom
+- name: Install Homebrew casks
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - arc
+    - capcut
+    - discord
+    - iterm2
+    - notion
+    - raycast
+    - rectangle
+    - spotify
+    - visual-studio-code
+    - zoom
 
-    - name: Set Homebrew auto-update and cleanup
-      shell: |
-        brew update
-        brew upgrade
-        brew cleanup --zap
-
+- name: Set Homebrew auto-update and cleanup
+  shell: |
+    brew update
+    brew upgrade
+    brew cleanup
+  args:
+    executable: /bin/bash

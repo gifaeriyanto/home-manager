@@ -1,0 +1,4 @@
+- name: Install Fira Code Nerd Font
+  homebrew_cask:
+    name: font-fira-code-nerd-font
+    state: present

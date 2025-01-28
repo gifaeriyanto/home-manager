@@ -6,6 +6,9 @@
     - name: Include core tasks
       include_tasks: tasks/core.yml
 
+    - name: Include Fonts setup
+      include_tasks: tasks/fonts.yml
+
     - name: Include Fish shell setup
       include_tasks: tasks/shells/fish.yml
 
