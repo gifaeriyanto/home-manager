@@ -29,7 +29,7 @@ Choose the number, then it will be automatically imported.
 For **Private Key**
 
 ```bash
-# download it from telegram with "gpg secret key" keyword
+# [FOR ME] download it from telegram with "gpg secret key" keyword
 gpg --import secret.pgp
 
 # verify the key
