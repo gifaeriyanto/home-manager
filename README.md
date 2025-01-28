@@ -44,7 +44,6 @@ If fail because no pinentry, do these:
 # check pinentry-program
 cat ~/.gnupg/gpg-agent.conf
 # should be `pinentry-program $(brew --prefix)/bin/pinentry-mac`
-# pinentry-mac already installed from nix, just make sure the path is correct
 
 # restart gpg agent if you edit the gpg-agent.conf
 gpgconf --kill gpg-agent
