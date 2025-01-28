@@ -1,0 +1,11 @@
+- name: Install and configure the system
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Include core tasks
+      include_tasks: tasks/core.yml
+
+    - name: Include Fish shell setup
+      include_tasks: tasks/shells/fish.yml
+
