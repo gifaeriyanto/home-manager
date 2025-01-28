@@ -1,0 +1,47 @@
+- name: Ensure Git is installed
+  homebrew:
+    name: git
+    state: present
+
+- name: Set Git global username
+  command: git config --global user.name "Gifa Eriyanto"
+
+- name: Set Git global email
+  command: git config --global user.email "gifa.eriyanto@gmail.com"
+
+- name: Set Git signing key
+  command: git config --global user.signingKey "78621E1AED00697E"
+
+- name: Enable GPG signing by default
+  command: git config --global commit.gpgSign true
+
+- name: Set GPG program path for Git
+  command: git config --global gpg.program gpg
+
+- name: Set Git default branch name to 'main'
+  command: git config --global init.defaultBranch main
+
+- name: Create global gitignore file
+  copy:
+    dest: "{{ ansible_env.HOME }}/.gitignore_global"
+    content: |
+      *~
+      .DS_Store
+      *.swp
+
+- name: Configure Git to use global gitignore file
+  command: git config --global core.excludesFile "{{ ansible_env.HOME }}/.gitignore_global"
+
+- name: Install diff-so-fancy
+  homebrew:
+    name: diff-so-fancy
+    state: present
+
+- name: Configure Git to use diff-so-fancy for diffs
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.gitconfig"
+    block: |
+      [core]
+        pager = diff-so-fancy | less --tabs=4 -R
+      [interactive]
+        diffFilter = diff-so-fancy
