@@ -33,6 +33,7 @@
     - ghq
     - gnupg
     - gh
+    - orbstack
     - python@3.10
 
 - name: Install Homebrew casks
