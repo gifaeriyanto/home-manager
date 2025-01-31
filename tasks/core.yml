@@ -21,6 +21,7 @@
     - 409201541 # Pages
     - 803453959 # Slack
     - 747648890 # Telegram
+    - 412759995 # Guidance - Islamic Prayer Times
 
 - name: Install Homebrew brews
   homebrew:
