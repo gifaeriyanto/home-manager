@@ -1,4 +1,4 @@
-# Gifa Home Manager with Ansible
+# Gifa's Home Manager with Ansible
 
 Automate local apps installation and configuration with Ansible.
 
