@@ -3,14 +3,6 @@
     name: fish
     state: present
 
-- name: Install Fish plugins
-  homebrew:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - thefuck
-    - z
-
 - name: Add Fish shell to /etc/shells
   shell: |
     if ! grep -Fxq "/opt/homebrew/bin/fish" /etc/shells; then
@@ -29,39 +21,75 @@
   lineinfile:
     path: ~/.config/fish/config.fish
     create: yes
-    regexp: '^set -U fish_user_paths /opt/homebrew/bin'
-    line: 'set -U fish_user_paths /opt/homebrew/bin $fish_user_paths'
+    regexp: "^set -U fish_user_paths /opt/homebrew/bin"
+    line: "set -U fish_user_paths /opt/homebrew/bin $fish_user_paths"
 
 - name: Add Fish shell initialization
   lineinfile:
     path: ~/.config/fish/config.fish
     create: yes
-    regexp: '^ulimit -n'
-    line: 'ulimit -n 200000'
+    regexp: "^ulimit -n"
+    line: "ulimit -n 200000"
   with_items:
-    - { regexp: '^ulimit -n', line: 'ulimit -n 200000' }
-    - { regexp: '^ulimit -u', line: 'ulimit -u 2048' }
-    - { regexp: '^set -U fish_color_command', line: 'set -U fish_color_command 6CB6EB --bold' }
-    - { regexp: '^set -U fish_color_redirection', line: 'set -U fish_color_redirection DEB974' }
-    - { regexp: '^set -U fish_color_operator', line: 'set -U fish_color_operator DEB974' }
-    - { regexp: '^set -U fish_color_end', line: 'set -U fish_color_end C071D8 --bold' }
-    - { regexp: '^set -U fish_color_error', line: 'set -U fish_color_error EC7279 --bold' }
-    - { regexp: '^set -U fish_color_param', line: 'set -U fish_color_param 6CB6EB' }
-    - { regexp: '^set fish_greeting', line: 'set fish_greeting' }
+    - { regexp: "^ulimit -n", line: "ulimit -n 200000" }
+    - { regexp: "^ulimit -u", line: "ulimit -u 2048" }
+    - {
+        regexp: "^set -U fish_color_command",
+        line: "set -U fish_color_command 6CB6EB --bold",
+      }
+    - {
+        regexp: "^set -U fish_color_redirection",
+        line: "set -U fish_color_redirection DEB974",
+      }
+    - {
+        regexp: "^set -U fish_color_operator",
+        line: "set -U fish_color_operator DEB974",
+      }
+    - {
+        regexp: "^set -U fish_color_end",
+        line: "set -U fish_color_end C071D8 --bold",
+      }
+    - {
+        regexp: "^set -U fish_color_error",
+        line: "set -U fish_color_error EC7279 --bold",
+      }
+    - {
+        regexp: "^set -U fish_color_param",
+        line: "set -U fish_color_param 6CB6EB",
+      }
+    - { regexp: "^set fish_greeting", line: "set fish_greeting" }
   loop: "{{ items }}"
   loop_control:
     loop_var: item
   vars:
     items:
-      - { regexp: '^ulimit -n', line: 'ulimit -n 200000' }
-      - { regexp: '^ulimit -u', line: 'ulimit -u 2048' }
-      - { regexp: '^set -U fish_color_command', line: 'set -U fish_color_command 6CB6EB --bold' }
-      - { regexp: '^set -U fish_color_redirection', line: 'set -U fish_color_redirection DEB974' }
-      - { regexp: '^set -U fish_color_operator', line: 'set -U fish_color_operator DEB974' }
-      - { regexp: '^set -U fish_color_end', line: 'set -U fish_color_end C071D8 --bold' }
-      - { regexp: '^set -U fish_color_error', line: 'set -U fish_color_error EC7279 --bold' }
-      - { regexp: '^set -U fish_color_param', line: 'set -U fish_color_param 6CB6EB' }
-      - { regexp: '^set fish_greeting', line: 'set fish_greeting' }
+      - { regexp: "^ulimit -n", line: "ulimit -n 200000" }
+      - { regexp: "^ulimit -u", line: "ulimit -u 2048" }
+      - {
+          regexp: "^set -U fish_color_command",
+          line: "set -U fish_color_command 6CB6EB --bold",
+        }
+      - {
+          regexp: "^set -U fish_color_redirection",
+          line: "set -U fish_color_redirection DEB974",
+        }
+      - {
+          regexp: "^set -U fish_color_operator",
+          line: "set -U fish_color_operator DEB974",
+        }
+      - {
+          regexp: "^set -U fish_color_end",
+          line: "set -U fish_color_end C071D8 --bold",
+        }
+      - {
+          regexp: "^set -U fish_color_error",
+          line: "set -U fish_color_error EC7279 --bold",
+        }
+      - {
+          regexp: "^set -U fish_color_param",
+          line: "set -U fish_color_param 6CB6EB",
+        }
+      - { regexp: "^set fish_greeting", line: "set fish_greeting" }
 
 - name: Install Starship prompt
   homebrew:
@@ -72,8 +100,8 @@
   lineinfile:
     path: ~/.config/fish/config.fish
     create: yes
-    regexp: '^starship init fish'
-    line: 'starship init fish | source'
+    regexp: "^starship init fish"
+    line: "starship init fish | source"
 
 - name: Apply Starship Nerd Font preset
   shell: |
@@ -81,3 +109,20 @@
   args:
     executable: /bin/bash
   register: starship_preset_result
+
+- name: Install Fisher package manager (if not installed)
+  shell: |
+    if ! fish -c "functions -q fisher"; then
+      curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    fi
+  args:
+    executable: /bin/bash
+
+- name: Install Fish plugins
+  shell: |
+    fisher install {{ item }}
+  args:
+    executable: /bin/bash
+  loop:
+    - jethrokuan/z
+    - jhillyerd/plugin-git
